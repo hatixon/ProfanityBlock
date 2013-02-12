@@ -1,0 +1,58 @@
+#CONSULT README FOR INFORMATION ON THE CONFIG
+commandsList:
+- msg
+- r
+- tell
+- afk
+- me
+Check:
+  Commands: true
+  Signs: true
+BreakSignsOnSwear: true
+PunishmentType: warnings
+MuteOrBan: ban
+Damage: 6
+RemainingWarningsBeforeKick: 3
+TotalWarnings: 6
+Notify:
+  Player: true
+  Op: true
+Money:
+  Penalty: 100
+  Enabled: false
+ResetWarningsOnBan: true
+Caps:
+  Percentage: 50
+  Enabled: true
+  Enforced: true
+Message:
+  FirstJoin: You have been given the default number of warnings!
+  Swear:  
+    Warning: You are not allowed to say that!
+    Kick: You have been kicked for swearing!
+    Ban: You have been banned for repeated swearing!
+  InstaBan: You have been instantly banned for using a word on the instant ban list!
+  Caps:
+    Warn: You have used too many capitals!
+    Kick: You were kicked for using too many capitals!
+    Ban: You were banned for spamming capitals!
+  Notification:
+    Caps: /player/ spammed capitals!
+    Command: /player/ tried to swear using a command!
+    Sign: /player/ tried to swear on a sign!
+    Chat: /player/ swore in chat!
+    Ban: /player/ was banned!
+    Mute: /player/ was muted!
+    Kick: /player/ was kicked!
+BanCommands:
+  Ban: ban
+  InstaBan: ban 
+  CapsBan: ban
+CheckForUpdates: false
+Compact:
+  Replacement: false
+  Char: '*'
+BypassCode:
+  Caps: 'Will be replaced'
+  CapsCancel: 'Will be replaced'
+RandomizeCodes: true

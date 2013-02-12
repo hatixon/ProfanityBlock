@@ -1,0 +1,4 @@
+#ANY WORD TO BE CENSORED GOES HERE.
+#Look at http://dev.bukkit.org/server-mods/mutenizer/pages/main/formatting for help on formatting
+InstaBanList:
+- \w*cunt\w*
