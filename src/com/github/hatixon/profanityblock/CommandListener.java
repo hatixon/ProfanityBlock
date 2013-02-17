@@ -54,7 +54,17 @@ public class CommandListener implements Listener
 					sb.append(splits[l]).append(" ");
 				}
 		    	String message = sb.toString();
-
+				if(!player.hasPermission("pb.bypass.spam"))
+				{
+					if(plugin.isRepeated(e.getPlayer(), message))
+					{
+						player.sendMessage(new StringBuilder(pre).append(" Message stopped by spam filter!").toString());
+						e.setCancelled(true);
+					}else
+					{
+						plugin.addRepeated(e.getPlayer(), message);
+					}
+				}
 		    	String action;
 	    		if(player.hasPermission("pb.bypass.swear") || player.hasPermission("pb.*"))
 	    		{

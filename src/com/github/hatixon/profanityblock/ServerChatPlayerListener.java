@@ -46,10 +46,22 @@ public class ServerChatPlayerListener extends JavaPlugin implements Listener
 			player.sendMessage(new StringBuilder(pre).append(" You are muted and can not talk!").toString());
 			return;
 		}
+		if(!player.hasPermission("pb.bypass.spam"))
+		{
+			if(plugin.isRepeated(chat.getPlayer(), message))
+			{
+				player.sendMessage(new StringBuilder(pre).append(" Message stopped by spam filter!").toString());
+				chat.setCancelled(true);
+			}else
+			{
+				plugin.addRepeated(chat.getPlayer(), message);
+			}
+		}
 		if(player.hasPermission("pb.bypass.swear") || player.hasPermission("pb.*"))
 		{
 			return;
 		}
+		
 		if(plugin.instaBanCheck(message))
 		{
     		if(player.hasPermission("pb.bypass.ban") || player.hasPermission("pb.*"))

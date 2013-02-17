@@ -1,6 +1,6 @@
 name: ProfanityBlock
 main: com.github.hatixon.profanityblock.ProfanityBlock
-version: 2.3.4
+version: 2.4
 
 commands:
   pb:
@@ -8,54 +8,35 @@ commands:
     usage: /pb help
     default: op
 permissions:
-
   pb:
     default: op
-
   pb.list:
     default: op
-
   pb.edit:
     default: op
-  
   pb.reset:
     default: op
-
   pb.warnings:
     default: op
-    
   pb.warnings.others:
     default: op
-  
   pb.bypass.swear:
     default: op
-      
   pb.bypass.caps:
     default: op
-      
   pb.bypass.ban:
     default: op
-  
   pb.bypass.money:
     default: op
-  
   pb.bypass.commandcheck:
     default: op
-  
   pb.bypass.signcheck:
     default: op
-    
   pb.notify:
     default: op
-    
   pb.version:
     default: op
-
   pb.set:
     default: op
-
   pb.mute:
-    default: op
-
-  pb.bypass.mute:
     default: op

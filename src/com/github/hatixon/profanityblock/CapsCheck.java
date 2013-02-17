@@ -25,7 +25,7 @@ public class CapsCheck implements Listener
 		{
 			return;
 		}
-		if(e.getMessage().length() < 4)
+		if(e.getMessage().length() < plugin.getConfig().getInt("Caps.MinimumLength"))
 		{
 			return;
 		}

@@ -54,7 +54,9 @@ public class ProfanityBlock extends JavaPlugin
 	private File warnFile = null;
 	
 	private Map blackWordList;
-	 
+	
+	private Map<Player, String> repeatList = new HashMap();
+	
 	private Map whiteWordList;
 	
 	private Map instaBanList;
@@ -401,6 +403,8 @@ public class ProfanityBlock extends JavaPlugin
 				logger.info(new StringBuilder(pre).append("There is an updated version of ProfanityBlock. Download at http://dev.bukkit.org/server-mods/mutenizer/").toString());
 			}
 		}
+		getConfig().set("Caps.MinimumLength", Integer.valueOf(5));
+		saveConfig();
 	}
 	
     public String getLatest()
@@ -525,31 +529,6 @@ public class ProfanityBlock extends JavaPlugin
 		}
 	}
 	
-	private void getApetureSymbol()
-	{
-		logger.info("\n" +
-		"             .,-:;//;:=,\n" +
-		"          . :H@@@MM@M#H/.,+%;,\n" +
-		"       ,/X+ +M@@M@MM%=,-%HMMM@X/,\n" +
-		"     -+@MM; $M@@MH+-,;XMMMM@MMMM@+-\n" +
-		"    ;@M@@M- XM@X;. -+XXXXXHHH@M@M#@/.\n"+
-		"  ,%MM@@MH ,@%=             ._________.\n"+
-		"  =@#@@@MX.,                -%HX$$%%%:;\n"+
-		" =-./@M@M$                   .;@MMMM@MM:\n"+
-		" X@/ -$MM/                    . +MM@@@M$\n"+
-		",@M@H: :@:                    . =X#@@@@-\n"+
-		",@@@MMX, .                    /H- ;@M@M=\n"+
-		".H@@@@M@+,                    %MM+..%#$.\n"+
-		" /MMMM@MMH/.                  XM@MH; =;\n"+
-		"  /%+%$XHH@$=              , .H@@@@MX,\n"+
-		"   ._________.           -%H.,@@@@@MX,\n"+
-		"   .%MM@@@HHHXX$$$%+- .:$MMX =M@@MM%.\n"+
-		"     =XMMM@MM@MM#H;,-+HMM@M+ /MMMX=\n"+
-		"       =%@M@M#@$-.=$@MM@@@M; %M%=\n"+
-		"         ,:+$+-,/H#MMMMMMM@= =,\n"+
-		"               =++%%%%+/:-.\n");
-	}
-
 	public void loadConfiguration()
 	{
 		this.getConfig().options().copyDefaults(true);
@@ -1306,5 +1285,32 @@ public class ProfanityBlock extends JavaPlugin
         	String thisEntry = (String)iterator.next();
             mutePlayer(thisEntry);
         }
+	}
+	
+	public boolean isRepeated(Player p, String message)
+	{
+        for(Iterator iterator = repeatList.entrySet().iterator(); iterator.hasNext();)
+        {
+            Map.Entry entry = (Map.Entry)iterator.next();
+            Player thisEntry = (Player)entry.getKey();
+            String thisValue = (String)entry.getValue();
+            if(thisEntry == p && thisValue.equalsIgnoreCase(message))
+            {
+            	return true;
+            }
+        }
+		return false;
+	}
+	
+	public void addRepeated(Player p, String message)
+	{
+		if(repeatList.containsKey(p))
+		{
+			repeatList.remove(p);
+			repeatList.put(p, message);
+		}else
+		{
+			repeatList.put(p, message);
+		}
 	}
 }
