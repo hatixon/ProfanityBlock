@@ -35,6 +35,7 @@ Caps: #This determines is caps are censored as well the percentage allowed in an
   Percentage: 50
   Enabled: true #This will determine if they are checked!
   Enforced: true #This will determine if they result in a punishment!
+  MinimumLength: 5 #This determines the minimum message length that caps will be censored on. Anything under this number will be allowed.
   
 Message: #This section controls most of the messages used, including ban reason and kick messages.
   FirstJoin: You have been given the default number of warnings!
@@ -64,3 +65,5 @@ BypassCode: #This is crucial to the plugin so it doesn't punish a player twice f
   CapsCancel: 'Will be replaced'
   
 RandomizeCodes: true #This will change the codes every time the plugin is loaded. Change to false to keep codes the same and increase start up time!
+
+SpamEnabled: true #This decides whether repeated messages are blocked or allowed. Filter is also case insensitive!
