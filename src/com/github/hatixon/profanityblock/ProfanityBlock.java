@@ -403,7 +403,8 @@ public class ProfanityBlock extends JavaPlugin
 				logger.info(new StringBuilder(pre).append("There is an updated version of ProfanityBlock. Download at http://dev.bukkit.org/server-mods/mutenizer/").toString());
 			}
 		}
-		getConfig().set("Caps.MinimumLength", Integer.valueOf(5));
+		getConfig().addDefault("Caps.MinimumLength", Integer.valueOf(5));
+		getConfig().addDefault("SpamEnabled", true);
 		saveConfig();
 	}
 	
