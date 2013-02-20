@@ -54,20 +54,6 @@ public class CommandListener implements Listener
 					sb.append(splits[l]).append(" ");
 				}
 		    	String message = sb.toString();
-		    	if(plugin.getConfig().getBoolean("SpamEnabled"))
-		    	{
-					if(!player.hasPermission("pb.bypass.spam"))
-					{
-						if(plugin.isRepeated(e.getPlayer(), message))
-						{
-							player.sendMessage(new StringBuilder(pre).append(" Message stopped by spam filter!").toString());
-							e.setCancelled(true);
-						}else
-						{
-							plugin.addRepeated(e.getPlayer(), message);
-						}
-					}
-		    	}
 		    	String action;
 	    		if(player.hasPermission("pb.bypass.swear") || player.hasPermission("pb.*"))
 	    		{
@@ -180,26 +166,12 @@ public class CommandListener implements Listener
 				        				if(plugin.getResetOnBan())
 				        				{
 				        					plugin.resetBanned(uName);
+				        				}
 				        					plugin.bunnyRabbit(player);
 				        					if(plugin.getNotifyOp())
+				        					{
 				        						plugin.notifyOp(player, "banned");
-				        				}else
-				        				{
-				        					plugin.bunnyRabbit(player);
-				    	                    Player arr[] = plugin.getServer().getOnlinePlayers();
-				    	                    int len = arr.length;
-				    	                    if(plugin.getNotifyOp())
-				    	                    {
-				    	                    	for(int i = 0; i < len; i++)
-				    	                    	{
-				    	                    		Player player2 = arr[i];
-				    	                    		if(player2.hasPermission("pb.notify") || player2.hasPermission("pb.*"))
-				    	                    		{
-				    	                    			player2.sendMessage((new StringBuilder(pre)).append(" ").append(uName.toUpperCase()).append(" was banned for repeated swearing.").toString());
-				    	                    		}
-				    	                    	}
-				    	                    }
-				        				}
+				        					}
 				        			}
 				        		}
 				    		}
@@ -213,7 +185,54 @@ public class CommandListener implements Listener
 						{
 							player.damage(plugin.getConfig().getInt("Damage"));
 						}
+						return;
 			    	}
+					if(!player.hasPermission("pb.bypass.spam"))
+					{
+						String verdict = plugin.redirect(player, message, new Date().getTime());
+						if(verdict.isEmpty())
+						{
+							
+						}else
+						{
+							e.setCancelled(true);
+						}
+						if(verdict.equalsIgnoreCase("banned"))
+						{
+							if(plugin.getConfig().getString("SpamMuteOrBan").equalsIgnoreCase("mute"))
+							{
+								plugin.mutePlayer(player.getName());
+								if(plugin.getNotifyOp())
+								{
+									plugin.notifyOp(player, "muted");
+								}
+								player.sendMessage(new StringBuilder(pre).append(" You have been muted!").toString());
+							}else
+							if(plugin.getConfig().getString("SpamMuteOrBan").equalsIgnoreCase("ban"))
+							{
+								plugin.spamBan(player);
+								if(plugin.getNotifyOp())
+								{
+									plugin.notifyOp(player, "banned");
+								}
+							}else
+							{
+								plugin.logger.log(Level.SEVERE, new StringBuilder(pre).append(" Incorrect config option: MuteOrBan. Must be either \"mute\" or \"ban\"").toString());
+							}
+							e.setCancelled(true);
+						}else
+						if(verdict.equalsIgnoreCase("warned"))
+						{
+							plugin.logger.log(Level.INFO, new StringBuilder().append("Player ").append(player.getName()).append(" blocked by spam: ").append(e.getMessage()).toString());
+							plugin.addRepeated(player,e.getMessage(), new Date().getTime());
+							e.setCancelled(true);
+							return;
+						}else
+						{
+						}
+						plugin.addRepeated(player,e.getMessage(), new Date().getTime());
+						return;
+					}
 				}
 			}
 		}

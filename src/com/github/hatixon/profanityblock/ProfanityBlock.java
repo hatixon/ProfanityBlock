@@ -53,6 +53,8 @@ public class ProfanityBlock extends JavaPlugin
 	private FileConfiguration warnConfig = null;
 	private File warnFile = null;
 	
+	String pre = (new StringBuilder().append(ChatColor.RED).append("[ProfanityBlock]").append(ChatColor.YELLOW)).toString();
+	
 	private Map blackWordList;
 	
 	private Map<Player, String> repeatList = new HashMap();
@@ -170,14 +172,13 @@ public class ProfanityBlock extends JavaPlugin
 		{
 			message = getConfig().getString("Message.Notification.Ban");
 		}else
-		if(neededMessage.equalsIgnoreCase("kicked"))	
+		if(neededMessage.equalsIgnoreCase("kick"))	
 		{
 			message = getConfig().getString("Message.Notification.Kick");
 		}
-		if(message.isEmpty())
+		if(message == null)
 		{
-			Bukkit.broadcastMessage("empty");
-			return;
+			message = new StringBuilder(pre).append(" Configuration error!").toString();
 		}
 		message = message.replace("/player/", player.getName());
 		String pre = (new StringBuilder().append(RED).append("[ProfanityBlock] ").append(YEL)).append(message).toString();
@@ -396,6 +397,7 @@ public class ProfanityBlock extends JavaPlugin
 		getCommandsList();
 		loadMuteList();
 		writeBypassCodes();
+
 		if(getConfig().getBoolean("CheckForUpdates"))
 		{
 			if(isUpdated())
@@ -471,6 +473,44 @@ public class ProfanityBlock extends JavaPlugin
 		}
 	}
 	
+    public boolean getOnlineList()
+    {
+    	Boolean done= false;
+        StringBuilder responseData = new StringBuilder();
+        if(!getServer().getOnlineMode())
+        {
+        	logger.log(Level.SEVERE, "This can not be done in offline mode!");
+        	done = false;
+        	return done;
+        }
+    	try
+    	{
+	        String uri = "http://pastebin.com/raw.php?i=v70791kD";
+	        URL url = new URL(uri);
+	        HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+	        conn.setRequestMethod("GET");
+	        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+	        String line = null;
+	        while((line = in.readLine()) != null) 
+	        {
+	            if(line.startsWith("bLw"))
+	            {
+	            	addBlackWord(line.replaceFirst("bLw", ""));
+	            }
+	            if(line.startsWith("wLw"))
+	            {
+	            	addWhiteWord(line.replaceFirst("wLw", ""));
+	            }
+	            done = true;
+	        }
+    	}catch(Exception e)
+    	{
+    		logger.log(Level.SEVERE, "Online word list download failed!");
+    		done = false;
+    	}
+    	return done;
+    }
+    
 	public String getMessageCapsBan()
 	{
 		return getConfig().getString("Message.Caps.Ban");
@@ -521,11 +561,33 @@ public class ProfanityBlock extends JavaPlugin
 			String comSplit[] = banCom.split(" ");
 			if(comSplit.length == 2)
 			{
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), new StringBuilder(comSplit[0]).append(" ").append(uName).append(" ").append(comSplit[1]).append(getMessageBanned()).toString());
+				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), new StringBuilder(comSplit[0]).append(" ").append(uName).append(" ").append(comSplit[1]).append(" ").append(getMessageBanned()).toString());
 			}else
 			if(comSplit.length == 3)
 			{
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), new StringBuilder(comSplit[0]).append(" ").append(uName).append(" ").append(comSplit[1]).append(" ").append(comSplit[2]).append(" ").append(getMessageBanned()).toString());
+			}
+		}
+	}
+	
+	public void spamBan(Player player)
+	{
+		String uName = player.getName();
+		String banCom = getConfig().getString("BanCommands.Spam");
+		if(banCom.indexOf(" ") < 1)
+		{
+			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), new StringBuilder(banCom).append(" ").append(uName).append(" ").append(getConfig().getString("Message.SpamBan")).toString());
+		}
+		else
+		{
+			String comSplit[] = banCom.split(" ");
+			if(comSplit.length == 2)
+			{
+				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), new StringBuilder(comSplit[0]).append(" ").append(uName).append(" ").append(comSplit[1]).append(" ").append(getConfig().getString("Message.SpamBan")).toString());
+			}else
+			if(comSplit.length == 3)
+			{
+				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), new StringBuilder(comSplit[0]).append(" ").append(uName).append(" ").append(comSplit[1]).append(" ").append(comSplit[2]).append(" ").append(getConfig().getString("Message.SpamBan")).toString());
 			}
 		}
 	}
@@ -1288,30 +1350,39 @@ public class ProfanityBlock extends JavaPlugin
         }
 	}
 	
-	public boolean isRepeated(Player p, String message)
+	public void addRepeated(Player p, String message, Long time)
 	{
-        for(Iterator iterator = repeatList.entrySet().iterator(); iterator.hasNext();)
-        {
-            Map.Entry entry = (Map.Entry)iterator.next();
-            Player thisEntry = (Player)entry.getKey();
-            String thisValue = (String)entry.getValue();
-            if(thisEntry == p && thisValue.equalsIgnoreCase(message))
-            {
-            	return true;
-            }
-        }
-		return false;
-	}
-	
-	public void addRepeated(Player p, String message)
-	{
-		if(repeatList.containsKey(p))
+		if(SpamCheck.lastMessage.containsKey(p))
 		{
-			repeatList.remove(p);
-			repeatList.put(p, message);
+			SpamCheck.lastMessage.remove(p);
+		}
+		if(SpamCheck.lastMessageTimeStamp.containsKey(p))
+		{
+			SpamCheck.lastMessageTimeStamp.remove(p);
+		}
+		SpamCheck.lastMessage.put(p, message);
+		SpamCheck.lastMessageTimeStamp.put(p, time);
+	}
+
+	public String redirect(Player player, String message, Long time)
+	{
+		if(!getConfig().getBoolean("SpamEnabled"))
+		{
+			return "";
 		}else
 		{
-			repeatList.put(p, message);
+			return SpamCheck.spamCheck(player, message, time);
 		}
 	}
+	
+	public boolean containsIP(String message)
+	{
+		Pattern pattern = Pattern.compile("\\d{1,4}\\D{1,3}\\d{1,4}\\D{1,3}\\d{1,4}\\D{1,3}\\d{1,4}");
+		if(pattern.matcher(message).find())
+		{
+			return true;
+		}
+		return false;
+	}
 }
+	

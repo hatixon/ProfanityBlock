@@ -11,6 +11,7 @@ Check:
 BreakSignsOnSwear: true
 PunishmentType: warnings
 MuteOrBan: ban
+SpamMuteOrBan: ban
 Damage: 6
 RemainingWarningsBeforeKick: 3
 TotalWarnings: 6
@@ -32,6 +33,7 @@ Message:
     Kick: You have been kicked for swearing!
     Ban: You have been banned for repeated swearing!
   InstaBan: You have been instantly banned for using a word on the instant ban list!
+  SpamBan: You have been banned for spamming!
   Caps:
     Warn: You have used too many capitals!
     Kick: You were kicked for using too many capitals!
@@ -48,6 +50,7 @@ BanCommands:
   Ban: ban
   InstaBan: ban 
   CapsBan: ban
+  Spam: ban
 CheckForUpdates: false
 Compact:
   Replacement: false

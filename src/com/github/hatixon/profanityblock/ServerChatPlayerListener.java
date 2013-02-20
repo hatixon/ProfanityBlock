@@ -21,8 +21,6 @@ import java.util.regex.*;
 public class ServerChatPlayerListener extends JavaPlugin implements Listener 
 {
 	public static ProfanityBlock plugin;
-	public static CapsCheck whatever;
-	
     public ServerChatPlayerListener(ProfanityBlock Instance)
     {
         plugin = Instance;
@@ -38,6 +36,7 @@ public class ServerChatPlayerListener extends JavaPlugin implements Listener
     	String message = chat.getMessage().toLowerCase();
     	ChatColor RED = ChatColor.RED;
     	ChatColor YEL = ChatColor.YELLOW;
+    	Date date = new Date();
     	String action;
 		String pre = (new StringBuilder().append(RED).append("[ProfanityBlock]").append(YEL)).toString();
 		if(plugin.isMuted(player.getName().toLowerCase()))
@@ -46,21 +45,67 @@ public class ServerChatPlayerListener extends JavaPlugin implements Listener
 			player.sendMessage(new StringBuilder(pre).append(" You are muted and can not talk!").toString());
 			return;
 		}
-		if(plugin.getConfig().getBoolean("SpamEnabled"))
+		if(plugin.containsIP(message))
 		{
-			if(!player.hasPermission("pb.bypass.spam"))
+			player.sendMessage(new StringBuilder(pre).append(" Do not advertise!").toString());
+			chat.setCancelled(true);
+			return;
+		}
+		if(!player.hasPermission("pb.bypass.spam"))
+		{
+			String verdict = plugin.redirect(player, message, new Date().getTime());
+			if(verdict.isEmpty())
 			{
-				if(plugin.isRepeated(chat.getPlayer(), message))
+				
+			}else
+			{
+				chat.setMessage("");
+				chat.setCancelled(true);
+			}
+			if(verdict.equalsIgnoreCase("banned"))
+			{
+				if(plugin.getConfig().getString("SpamMuteOrBan").equalsIgnoreCase("mute"))
 				{
-					player.sendMessage(new StringBuilder(pre).append(" Message stopped by spam filter!").toString());
-					chat.setCancelled(true);
+					plugin.mutePlayer(player.getName());
+					if(plugin.getNotifyOp())
+					{
+						plugin.notifyOp(player, "muted");
+					}
+					player.sendMessage(new StringBuilder(pre).append(" You have been muted!").toString());
+				}else
+				if(plugin.getConfig().getString("SpamMuteOrBan").equalsIgnoreCase("ban"))
+				{
+					plugin.spamBan(player);
+					if(plugin.getNotifyOp())
+					{
+						plugin.notifyOp(player, "banned");
+					}
 				}else
 				{
-					plugin.addRepeated(chat.getPlayer(), message);
+					plugin.logger.log(Level.SEVERE, new StringBuilder(pre).append(" Incorrect config option: MuteOrBan. Must be either \"mute\" or \"ban\"").toString());
 				}
+				chat.setCancelled(true);
+			}else
+			if(verdict.equalsIgnoreCase("warned"))
+			{
+				player.sendMessage(new StringBuilder().append("<").append(player.getDisplayName()).append("> ").append(message).toString());
+				plugin.logger.log(Level.INFO, new StringBuilder().append("p ").append(player.getName()).append(" blocked by spam: ").append(message).toString());
+				plugin.addRepeated(player,chat.getMessage(), new Date().getTime());
+				chat.setCancelled(true);
+				return;
+			}else
+			{
+				
 			}
-		}	
+			plugin.addRepeated(player,chat.getMessage(), new Date().getTime());
+		}
+		
 		if(player.hasPermission("pb.bypass.swear") || player.hasPermission("pb.*"))
+		{
+			return;
+		}
+		
+		if(chat.getMessage() == "" || chat.isCancelled())
 		{
 			return;
 		}
@@ -155,7 +200,7 @@ public class ServerChatPlayerListener extends JavaPlugin implements Listener
 	    		{
 	    			player.sendMessage(new StringBuilder(pre).append(" ").append(plugin.getMessageWarn()).toString());
 	    		}
-	    		
+	    		plugin.addRepeated(player, chat.getMessage(), new Date().getTime());
 	    		if(type.contains(("warnings").toLowerCase()))
 	    		{
 		    		if(plugin.getTotWarn().intValue() != -1)
@@ -231,7 +276,10 @@ public class ServerChatPlayerListener extends JavaPlugin implements Listener
 				{
 					player.damage(plugin.getConfig().getInt("Damage"));
 				}
+				return;
 	    	}
+
+			return;
 		}
     }
     
@@ -267,5 +315,8 @@ public class ServerChatPlayerListener extends JavaPlugin implements Listener
     			}
     		}
     	}
+    	SpamCheck.lastMessage.remove(p);
+    	SpamCheck.lastMessageTimeStamp.remove(p);
+    	SpamCheck.spamCount.remove(p);
     }
 }

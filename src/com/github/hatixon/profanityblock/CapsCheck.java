@@ -161,6 +161,7 @@ public class CapsCheck implements Listener
 					e.setCancelled(true);
 				}
 			}
+			return;
 		}
 	}
 }

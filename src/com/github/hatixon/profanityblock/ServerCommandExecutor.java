@@ -80,6 +80,16 @@ public class ServerCommandExecutor implements CommandExecutor
 							ccs.sendMessage(new StringBuilder(pre).append(" Please specify the player you are unmuting.").toString());
 						}
 	            	}
+	            	if(param.equalsIgnoreCase("download"))
+	            	{
+	            		if(plugin.getOnlineList())
+	            		{
+	            			ccs.sendMessage(new StringBuilder(pre).append(" A preconfigured word list has been downloaded!").toString());
+	            		}else
+	            		{
+	            			ccs.sendMessage(new StringBuilder(pre).append(" Failed to download word list!").toString());
+	            		}
+	            	}
 					if(param.equalsIgnoreCase("resetall"))
 					{
 						String thisPlayer;
@@ -145,7 +155,8 @@ public class ServerCommandExecutor implements CommandExecutor
 							&& !param.equalsIgnoreCase("ib")
 							&& !param.equalsIgnoreCase("w")
 							&& !param.equalsIgnoreCase("unmute")
-							&& !param.equalsIgnoreCase("mute"))
+							&& !param.equalsIgnoreCase("mute")
+							&& !param.equalsIgnoreCase("download"))
 						
 	                {
 	                	ccs.sendMessage(new StringBuilder(pre).append(" No such command. Use /pb help").toString());
@@ -638,11 +649,28 @@ public class ServerCommandExecutor implements CommandExecutor
 							&& !param.equalsIgnoreCase("ib")
 							&& !param.equalsIgnoreCase("w")
 							&& !param.equalsIgnoreCase("unmute")
-							&& !param.equalsIgnoreCase("mute"))
+							&& !param.equalsIgnoreCase("mute")
+							&& !param.equalsIgnoreCase("download"))
 	                {
 	                	p.sendMessage(new StringBuilder(pre).append(" No such command. Use /pb help").toString());
 	                	return true;
 	                }
+	            	if(p.hasPermission("pb.download"))
+	            	{
+						if(param.equalsIgnoreCase("download"))
+	            		{
+	            			if(plugin.getOnlineList())
+	            			{
+	            				p.sendMessage(new StringBuilder(pre).append(" A preconfigured word list has been downloaded!").toString());
+	            			}else
+		            		{
+		            			p.sendMessage(new StringBuilder(pre).append(" Failed to download word list!").toString());
+		            		}
+	            		}
+	            	}else
+	            	{
+	            		p.sendMessage(cantUse);
+	            	}
 					if(p.hasPermission("pb.mute"))
 					{
 		            	if(param.equalsIgnoreCase("mute"))
