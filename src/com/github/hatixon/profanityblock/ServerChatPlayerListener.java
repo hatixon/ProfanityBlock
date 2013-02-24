@@ -88,8 +88,9 @@ public class ServerChatPlayerListener extends JavaPlugin implements Listener
 			}else
 			if(verdict.equalsIgnoreCase("warned"))
 			{
+				String pre2 = new StringBuilder().append("\247c").append("[ProfanityBlock]").append("\247e").toString();
 				player.sendMessage(new StringBuilder().append("<").append(player.getDisplayName()).append("> ").append(message).toString());
-				plugin.logger.log(Level.INFO, new StringBuilder().append("p ").append(player.getName()).append(" blocked by spam: ").append(message).toString());
+				plugin.logger.log(Level.INFO, new StringBuilder().append(pre2).append(player.getName()).append(" blocked by spam: ").append(message).toString());
 				plugin.addRepeated(player,chat.getMessage(), new Date().getTime());
 				chat.setCancelled(true);
 				return;

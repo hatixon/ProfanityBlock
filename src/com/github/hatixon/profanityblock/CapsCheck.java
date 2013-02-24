@@ -103,7 +103,7 @@ public class CapsCheck implements Listener
 		    						}
 		    						else
 		    						{
-		    							action = plugin.getMessageKick();
+		    							action = plugin.getConfig().getString("Message.Caps.Kick");
 		    							p.kickPlayer(action);
 		    							if(plugin.getNotifyOp())
 		    							{
@@ -134,7 +134,7 @@ public class CapsCheck implements Listener
 		        					}
 		        					p.sendMessage(new StringBuilder(pre).append(" You have been muted!").toString());
 		        				}else
-		        				if(plugin.getConfig().getString("MuteOrBan").equalsIgnoreCase("banned"))
+		        				if(plugin.getConfig().getString("MuteOrBan").equalsIgnoreCase("ban"))
 		        				{
 		        					plugin.capsBunnyRabbit(p);
 		        					if(plugin.getNotifyOp())
