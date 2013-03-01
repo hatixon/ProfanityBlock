@@ -35,7 +35,7 @@ import com.github.hatixon.profanityblock.logging.ProLogger;
 @SuppressWarnings({"unused", "rawtypes", "unchecked"})
 public class ProfanityBlock extends JavaPlugin
 {
-	public static ProfanityBlock plugin;
+	public final ProfanityBlock plugin = this;
     public final Logger logger = Logger.getLogger("Minecraft");
 	public final ServerChatPlayerListener playerChatListener = new ServerChatPlayerListener(this);
 	public final CapsCheck playerCapsCheck = new CapsCheck(this);
@@ -397,7 +397,6 @@ public class ProfanityBlock extends JavaPlugin
 		getCommandsList();
 		loadMuteList();
 		writeBypassCodes();
-
 		if(getConfig().getBoolean("CheckForUpdates"))
 		{
 			if(isUpdated())
@@ -594,12 +593,12 @@ public class ProfanityBlock extends JavaPlugin
 	
 	public void loadConfiguration()
 	{
-		this.getConfig().options().copyDefaults(true);
-		this.getUserConfig().options().copyDefaults(true);
-		this.getWhiteConfig().options().copyDefaults(true);
-		this.getBlackConfig().options().copyDefaults(true);
-		this.getInstantConfig().options().copyDefaults(true);
-		this.getWarnConfig().options().copyDefaults(true);
+		getConfig().options().copyDefaults(true);
+		getUserConfig().options().copyDefaults(true);
+		getWhiteConfig().options().copyDefaults(true);
+		getBlackConfig().options().copyDefaults(true);
+		getInstantConfig().options().copyDefaults(true);
+		getWarnConfig().options().copyDefaults(true);
 		saveDefaultConfig();
 		saveUserConfig();
 		saveWhiteConfig();
@@ -1090,7 +1089,7 @@ public class ProfanityBlock extends JavaPlugin
             Matcher m = patt.matcher(message);
             if(m.find())
             {
-                message = message.replaceAll(theRegex, "");
+                message = message.replaceAll(theRegex, "WhItEliSTeDReMoVeD");
             }
         }
         return message;
@@ -1142,7 +1141,19 @@ public class ProfanityBlock extends JavaPlugin
 	
     public boolean addWhiteWord(String whiteWord)
     {
-    	whiteWord = new StringBuilder().append("\\w*").append(whiteWord).append("\\w*").toString();
+    	StringBuilder sb = new StringBuilder();
+    	String arr[] = whiteWord.split("");
+    	for(int x = 1; x < arr.length; x++)
+    	{
+    		if(x == (arr.length - 1))
+    		{
+    			sb.append(arr[x]);
+    		}else
+    		{
+    			sb.append(arr[x]).append("+?");
+    		}
+    	}
+    	whiteWord = new StringBuilder().append("\\w*").append(sb.toString()).append("\\w*").toString();
     	if(whiteWordList.containsKey(whiteWord))
     	{
     		return false;
@@ -1166,12 +1177,24 @@ public class ProfanityBlock extends JavaPlugin
     
     public boolean delWhiteWord(String whiteWord)
     {
-    	whiteWord = new StringBuilder().append("\\w*").append(whiteWord).append("\\w*").toString();
         if(whiteWord.indexOf(":") > 0)
         {
             String thisSplit[] = whiteWord.split(":", 2);
             whiteWord = thisSplit[0];
         }
+    	StringBuilder sb = new StringBuilder();
+    	String arr[] = whiteWord.split("");
+    	for(int x = 1; x < arr.length; x++)
+    	{
+    		if(x == (arr.length - 1))
+    		{
+    			sb.append(arr[x]);
+    		}else
+    		{
+    			sb.append(arr[x]).append("+?");
+    		}
+    	}
+    	whiteWord = new StringBuilder().append("\\w*").append(sb.toString()).append("\\w*").toString();
         if(whiteWordList.containsKey(whiteWord))
         {
             whiteWordList.remove(whiteWord);
@@ -1188,19 +1211,45 @@ public class ProfanityBlock extends JavaPlugin
 		if(blackWord.indexOf(":") > 0)
         {
             String thisSplit[] = blackWord.split(":", 2);
-            if(blackWordList.containsKey(new StringBuilder().append("\\w*").append(thisSplit[0]).append("\\w*").toString()))
+        	StringBuilder sb = new StringBuilder();
+        	String arr[] = thisSplit[0].split("");
+        	for(int x = 1; x < arr.length; x++)
+        	{
+        		if(x == (arr.length - 1))
+        		{
+        			sb.append(arr[x]);
+        		}else
+        		{
+        			sb.append(arr[x]).append("+?");
+        		}
+        	}
+        	String split1Word = new StringBuilder().append("\\w*").append(sb.toString()).append("\\w*").toString();
+            if(blackWordList.containsKey(split1Word))
             {
             	return false;
             }else
             {
-            	blackWordList.put(new StringBuilder().append("\\w*").append(thisSplit[0]).append("\\w*").toString(), thisSplit[1]);
+            	blackWordList.put(split1Word, thisSplit[1]);
                 saveBlackList();
             }
         } else
         {
-        	if(!blackWordList.containsKey(new StringBuilder().append("\\w*").append(blackWord).append("\\w*").toString()))
+        	StringBuilder sb = new StringBuilder();
+        	String arr[] = blackWord.split("");
+        	for(int x = 1; x < arr.length; x++)
         	{
-        		blackWordList.put(new StringBuilder().append("\\w*").append(blackWord).append("\\w*").toString(), "");
+        		if(x == (arr.length - 1))
+        		{
+        			sb.append(arr[x]);
+        		}else
+        		{
+        			sb.append(arr[x]).append("+?");
+        		}
+        	}
+        	blackWord = new StringBuilder().append("\\w*").append(sb.toString()).append("\\w*").toString();
+        	if(!blackWordList.containsKey(blackWord))
+        	{
+        		blackWordList.put(blackWord, "");
                 saveBlackList();
         		return true;
         	}else
@@ -1216,11 +1265,35 @@ public class ProfanityBlock extends JavaPlugin
     {
         if(blackWord.indexOf(":") > 0)
         {
-            String thisSplit[] = blackWord.split(":", 2);
-            blackWord = new StringBuilder().append("\\w*").append(thisSplit[0]).append("\\w*").toString();
+        	String thisSplit[] = blackWord.split(":", 2);
+        	StringBuilder sb = new StringBuilder();
+        	String arr[] = thisSplit[0].split("");
+        	for(int x = 1; x < arr.length; x++)
+        	{
+        		if(x == (arr.length - 1))
+        		{
+        			sb.append(arr[x]);
+        		}else
+        		{
+        			sb.append(arr[x]).append("+?");
+        		}
+        	}
+        	blackWord = new StringBuilder().append("\\w*").append(sb.toString()).append("\\w*").toString();
         }else
         {
-        	blackWord = new StringBuilder().append("\\w*").append(blackWord).append("\\w*").toString();
+	    	StringBuilder sb = new StringBuilder();
+	    	String arr[] = blackWord.split("");
+	    	for(int x = 1; x < arr.length; x++)
+	    	{
+	    		if(x == (arr.length - 1))
+	    		{
+	    			sb.append(arr[x]);
+	    		}else
+	    		{
+	    			sb.append(arr[x]).append("+?");
+	    		}
+	    	}
+	    	blackWord = new StringBuilder().append("\\w*").append(sb.toString()).append("\\w*").toString();
         }
         if(blackWordList.containsKey(blackWord))
         {
@@ -1236,7 +1309,19 @@ public class ProfanityBlock extends JavaPlugin
 	
     public boolean addBanWord(String banWord)
     {
-    	banWord = new StringBuilder().append("\\w*").append(banWord).append("\\w*").toString();
+    	StringBuilder sb = new StringBuilder();
+    	String arr[] = banWord.split("");
+    	for(int x = 1; x < arr.length; x++)
+    	{
+    		if(x == (arr.length - 1))
+    		{
+    			sb.append(arr[x]);
+    		}else
+    		{
+    			sb.append(arr[x]).append("+?");
+    		}
+    	}
+    	banWord = new StringBuilder().append("\\w*").append(sb.toString()).append("\\w*").toString();
     	if(instaBanList.containsKey(banWord))
     	{
     		return false;
@@ -1251,7 +1336,19 @@ public class ProfanityBlock extends JavaPlugin
     
     public boolean delBanWord(String banWord)
     {
-    	banWord = new StringBuilder().append("\\w*").append(banWord).append("\\w*").toString();
+    	StringBuilder sb = new StringBuilder();
+    	String arr[] = banWord.split("");
+    	for(int x = 1; x < arr.length; x++)
+    	{
+    		if(x == (arr.length - 1))
+    		{
+    			sb.append(arr[x]);
+    		}else
+    		{
+    			sb.append(arr[x]).append("+?");
+    		}
+    	}
+    	banWord = new StringBuilder().append("\\w*").append(sb.toString()).append("\\w*").toString();
         if(instaBanList.containsKey(banWord))
         {
             instaBanList.remove(banWord);
@@ -1377,12 +1474,37 @@ public class ProfanityBlock extends JavaPlugin
 	
 	public boolean containsIP(String message)
 	{
+		if(message.startsWith("http://") || message.startsWith("www"))
+		{
+			return false;
+		}
 		Pattern pattern = Pattern.compile("\\d{1,4}\\D{1,3}\\d{1,4}\\D{1,3}\\d{1,4}\\D{1,3}\\d{1,4}");
-		if(pattern.matcher(message).find())
+		Pattern pattern2 = Pattern.compile("[a-zA-Z]\\w*\\.[a-zA-Z]{4}\\w*\\.[a-zA-Z]\\w*");
+		Pattern localc = Pattern.compile("192\\.168\\.[0-9]\\w*\\.[0-9]\\w*");
+		Pattern locala = Pattern.compile("10\\.[0-9]\\w*\\.[0-9]\\w*\\.[0-9]\\w*");
+		Pattern localb = Pattern.compile("172\\.[1-3][0-9]\\.[0-9]\\w*\\.[0-9]\\w*");
+		if((pattern.matcher(message).find() || pattern2.matcher(message).find()) && !(locala.matcher(message).find() || localb.matcher(message).find() || localc.matcher(message).find()))
 		{
 			return true;
 		}
 		return false;
 	}
+	
+	/*public boolean reloadChanges()
+	{
+		try
+		{
+			getServer().getPluginManager().disablePlugin(plugin);
+			getServer().getPluginManager().enablePlugin(plugin);
+			return true;
+		}catch(Exception e)
+		{
+			e.printStackTrace();
+			return false;
+		}
+	}
+	*/
+	
+	
 }
 	

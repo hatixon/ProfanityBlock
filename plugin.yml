@@ -1,6 +1,6 @@
 name: ProfanityBlock
 main: com.github.hatixon.profanityblock.ProfanityBlock
-version: 2.5.1
+version: 2.5.2
 
 commands:
   pb:

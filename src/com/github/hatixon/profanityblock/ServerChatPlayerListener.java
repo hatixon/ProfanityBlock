@@ -176,10 +176,11 @@ public class ServerChatPlayerListener extends JavaPlugin implements Listener
     			String message2 = plugin.censorCheck(message);
     			if(message2.length() > 0)
     			{
-    				chat.setMessage(new StringBuilder().append(message2).append(" ").append(new StringBuilder().append("bypasscode").append(BypassCode)).toString());
+    				chat.setMessage(message2);
+    				plugin.playerCapsCheck.bypassMaps.add(uName);
     			} else
     			{    				
-    				chat.setMessage(new StringBuilder().append(message2).append(" ").append(new StringBuilder().append("bypasscode").append(BypassCodeCancel)).toString());
+    				chat.setCancelled(true);
     			}
 	            if(plugin.getNotifyOp())
 	            {

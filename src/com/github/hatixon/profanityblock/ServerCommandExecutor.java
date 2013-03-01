@@ -187,7 +187,7 @@ public class ServerCommandExecutor implements CommandExecutor
 		        	            String thisWord;
 		        	            String replaceAppend;
 		        	            ccs.sendMessage((new StringBuilder(pre).append(" Whitelisted words:")).toString());
-		            			for(Iterator iterator = whiteList.entrySet().iterator(); iterator.hasNext(); sender.sendMessage((new StringBuilder(String.valueOf(thisWord).replace("\\w*", "").replace("+?", ""))).append(replaceAppend).toString()))
+		            			for(Iterator iterator = whiteList.entrySet().iterator(); iterator.hasNext(); sender.sendMessage((new StringBuilder(String.valueOf(thisWord).replace("\\w*", "")/*.replace("+?", "")*/)).append(replaceAppend).toString()))
 		        	            {
 		        	                java.util.Map.Entry entry = (java.util.Map.Entry)iterator.next();
 		        	                thisWord = (String)entry.getKey();
@@ -195,7 +195,6 @@ public class ServerCommandExecutor implements CommandExecutor
 		        	                replaceAppend = thisReplace.length() <= 0 ? "" : (new StringBuilder(":")).append(thisReplace).toString();
 		        	            }
 		            			return true;
-
 	            		}
 	            		
 
@@ -209,21 +208,15 @@ public class ServerCommandExecutor implements CommandExecutor
 			            		}
 		            			if(args.length > 2)
 		                        {
-		                            String whiteWord = args[2].toLowerCase();
-		                            if(whiteWord.indexOf("w*") > 0)
-		                            {
-		                            	ccs.sendMessage(new StringBuilder(pre).append(" You do not need to put \\w* in the word anymore. The plugin will do that for you").toString());
-		                            }else
-		                            {
-		                            	if(plugin.addWhiteWord(whiteWord))
-		                            	{
-		                            		ccs.sendMessage(new StringBuilder(pre).append(" ").append(whiteWord).append(" was added to the whitelist.").toString());
-		                            	} else	
-		                            	{
-		                            		ccs.sendMessage(new StringBuilder(pre).append(" ").append(whiteWord).append(" is already in the whitelist.").toString());
-		                            	}
-		                            	return true;
-		                            }
+		                            String whiteWord = args[2].toLowerCase().replace("\\w*", "").replace("+?", "");
+	                            	if(plugin.addWhiteWord(whiteWord))
+	                            	{
+	                            		ccs.sendMessage(new StringBuilder(pre).append(" ").append(whiteWord).append(" was added to the whitelist.").toString());
+	                            	} else	
+	                            	{
+	                            		ccs.sendMessage(new StringBuilder(pre).append(" ").append(whiteWord).append(" is already in the whitelist.").toString());
+	                            	}
+	                            	return true;
 		                        }else
 		                        if(args.length < 3)
 			            		{
@@ -242,21 +235,17 @@ public class ServerCommandExecutor implements CommandExecutor
 			            		}else
 		                        if(args.length > 2)
 		                        {
-		                            String whiteWord = args[2].toLowerCase();
-		                            if(whiteWord.indexOf("w*") > 0)
+		                            String whiteWord = args[2].toLowerCase().replace("\\w*", "").replace("+?", "");
+
+		                            if(plugin.delWhiteWord(whiteWord))
 		                            {
-		                            	ccs.sendMessage(new StringBuilder(pre).append(" You do not need to put \\w* in the word anymore. The plugin will do that for you").toString());
-		                            }else
+		                                ccs.sendMessage(new StringBuilder(pre).append(" ").append(whiteWord).append(" was deleted from the whitelist.").toString());
+		                            } else
 		                            {
-			                            if(plugin.delWhiteWord(whiteWord))
-			                            {
-			                                ccs.sendMessage(new StringBuilder(pre).append(" ").append(whiteWord).append(" was deleted from the whitelist.").toString());
-			                            } else
-			                            {
-			                                ccs.sendMessage(new StringBuilder(pre).append(" ").append(whiteWord).append(" is not in the whitelist.").toString());
-			                            }
-			                            return true;
+		                                ccs.sendMessage(new StringBuilder(pre).append(" ").append(whiteWord).append(" is not in the whitelist.").toString());
 		                            }
+		                            return true;
+		                            
 		                        }else
 		                        	
 		                        if(args.length < 3)
@@ -301,7 +290,7 @@ public class ServerCommandExecutor implements CommandExecutor
 							String thisWord;
 							String replaceAppend;
 							ccs.sendMessage((new StringBuilder(pre).append(" Blacklisted words:")).toString());
-							for(Iterator iterator = blackList.entrySet().iterator(); iterator.hasNext(); ccs.sendMessage((new StringBuilder(String.valueOf(thisWord).replace("\\w*", "").replace("+?", ""))).append(replaceAppend).toString()))
+							for(Iterator iterator = blackList.entrySet().iterator(); iterator.hasNext(); ccs.sendMessage((new StringBuilder(String.valueOf(thisWord).replace("\\w*", "")/*.replace("+?", "")*/)).append(replaceAppend).toString()))
 							{
 								java.util.Map.Entry entry = (java.util.Map.Entry)iterator.next();
 								thisWord = (String)entry.getKey();
@@ -333,27 +322,21 @@ public class ServerCommandExecutor implements CommandExecutor
 												sb.append(":");
 											}
 										}
-										blackWord = sb.toString().toLowerCase();
+										blackWord = sb.toString().toLowerCase().replace("\\w*", "").replace("+?", "");
 									}
 								} else
 								{
-									blackWord = args[2].toLowerCase();
+									blackWord = args[2].toLowerCase().replace("\\w*", "").replace("+?", "");
 								}
-	                            if(blackWord.indexOf("w*") > 0)
-	                            {
-	                            	ccs.sendMessage(new StringBuilder(pre).append(" You do not need to put \\w* in the word anymore. The plugin will do that for you").toString());
-	                            }else
-	                            {
-									if(plugin.addBlackWord(blackWord))
-									{
-										ccs.sendMessage(new StringBuilder(pre).append(" ").append(blackWord).append(" was added to the blacklist.").toString());
-									} else
-									{
-										String blackwords[] = blackWord.split(":");
-										ccs.sendMessage(new StringBuilder(pre).append(" ").append(blackwords[0]).append(" is already in the blacklist.").toString());
-									}
-									return true;
-	                            }
+								if(plugin.addBlackWord(blackWord))
+								{
+									ccs.sendMessage(new StringBuilder(pre).append(" ").append(blackWord).append(" was added to the blacklist.").toString());
+								} else
+								{
+									String blackwords[] = blackWord.split(":");
+									ccs.sendMessage(new StringBuilder(pre).append(" ").append(blackwords[0]).append(" is already in the blacklist.").toString());
+								}
+								return true;
 							}
 
 						}
@@ -382,28 +365,23 @@ public class ServerCommandExecutor implements CommandExecutor
 												sb.append(":");
 											}
 										}
-										blackWord = sb.toString().toLowerCase();
+										blackWord = sb.toString().toLowerCase().replace("\\w*", "").replace("+?", "");
 									}
 								}else
 								{
-									blackWord = args[2].toLowerCase();
+									blackWord = args[2].toLowerCase().replace("\\w*", "").replace("+?", "");
 								}
-	                            if(blackWord.indexOf("w*") > 0)
-	                            {
-	                            	ccs.sendMessage(new StringBuilder(pre).append(" You do not need to put \\w* in the word anymore. The plugin will do that for you").toString());
-	                            }else
-	                            {
-									if(plugin.delBlackWord(blackWord))
-									{
-										String blackwords[] = blackWord.split(":");
-										ccs.sendMessage(new StringBuilder(pre).append(" ").append(blackwords[0]).append(" was deleted from the blacklist.").toString());
-									} else
-									{
-										String blackwords[] = blackWord.split(":");
-										ccs.sendMessage(new StringBuilder(pre).append(" ").append(blackwords[0]).append(" is not in the blacklist.").toString());
-									}
-									return true;
-	                            }
+								if(plugin.delBlackWord(blackWord))
+								{
+									String blackwords[] = blackWord.split(":");
+									ccs.sendMessage(new StringBuilder(pre).append(" ").append(blackwords[0]).append(" was deleted from the blacklist.").toString());
+								} else
+								{
+									String blackwords[] = blackWord.split(":");
+									ccs.sendMessage(new StringBuilder(pre).append(" ").append(blackwords[0]).append(" is not in the blacklist.").toString());
+								}
+								return true;
+	                            
 							}
 
 						}
@@ -485,7 +463,7 @@ public class ServerCommandExecutor implements CommandExecutor
 		        	            String thisWord;
 		        	            String replaceAppend;
 		        	            ccs.sendMessage((new StringBuilder(pre).append(" Instaban words:")).toString());
-		            			for(Iterator iterator = instaBanList.entrySet().iterator(); iterator.hasNext(); sender.sendMessage((new StringBuilder(String.valueOf(thisWord.replace("\\w*", "").replace("+?", "")))).append(replaceAppend).toString()))
+		            			for(Iterator iterator = instaBanList.entrySet().iterator(); iterator.hasNext(); sender.sendMessage((new StringBuilder(String.valueOf(thisWord.replace("\\w*", "")/*.replace("+?", "")*/))).append(replaceAppend).toString()))
 		        	            {
 		        	                java.util.Map.Entry entry = (java.util.Map.Entry)iterator.next();
 		        	                thisWord = (String)entry.getKey();
@@ -507,21 +485,15 @@ public class ServerCommandExecutor implements CommandExecutor
 			            		}
 		            			if(args.length > 2)
 		                        {
-		                            String banWord = args[2].toLowerCase();
-		                            if(banWord.indexOf("w*") > 0)
+		                            String banWord = args[2].toLowerCase().replace("\\w*", "").replace("+?", "");
+	                            	if(plugin.addBanWord(banWord))
 		                            {
-		                            	ccs.sendMessage(new StringBuilder(pre).append(" You do not need to put \\w* in the word anymore. The plugin will do that for you").toString());
-		                            }else
+		                                ccs.sendMessage(new StringBuilder(pre).append(" ").append(banWord).append(" was added to the instaban.").toString());
+		                            } else
 		                            {
-		                            	if(plugin.addBanWord(banWord))
-			                            {
-			                                ccs.sendMessage(new StringBuilder(pre).append(" ").append(banWord).append(" was added to the instaban.").toString());
-			                            } else
-			                            {
-			                                ccs.sendMessage(new StringBuilder(pre).append(" ").append(banWord).append(" is already in the instaban list.").toString());
-			                            }
-			                            return true;
+		                                ccs.sendMessage(new StringBuilder(pre).append(" ").append(banWord).append(" is already in the instaban list.").toString());
 		                            }
+		                            return true;
 		                        }else
 		                        if(args.length < 3)
 			            		{
@@ -539,21 +511,16 @@ public class ServerCommandExecutor implements CommandExecutor
 			            		}else
 		                        if(args.length > 2)
 		                        {
-		                            String banWord = args[2].toLowerCase();
-		                            if(banWord.indexOf("w*") > 0)
+		                            String banWord = args[2].toLowerCase().replace("\\w*", "").replace("+?", "");
+		                            if(plugin.delBanWord(banWord))
 		                            {
-		                            	ccs.sendMessage(new StringBuilder(pre).append(" You do not need to put \\w* in the word anymore. The plugin will do that for you").toString());
-		                            }else
+		                                ccs.sendMessage(new StringBuilder(pre).append(" ").append(banWord).append(" was deleted from the instaban list.").toString());
+		                            } else
 		                            {
-			                            if(plugin.delBanWord(banWord))
-			                            {
-			                                ccs.sendMessage(new StringBuilder(pre).append(" ").append(banWord).append(" was deleted from the instaban list.").toString());
-			                            } else
-			                            {
-			                                ccs.sendMessage(new StringBuilder(pre).append(" ").append(banWord).append(" is not in the instaban list.").toString());
-			                            }
-			                            return true;
-		                            }   
+		                                ccs.sendMessage(new StringBuilder(pre).append(" ").append(banWord).append(" is not in the instaban list.").toString());
+		                            }
+		                            return true;
+		                            
 		                        }else
 		                        	
 		                        if(args.length < 3)
@@ -650,7 +617,9 @@ public class ServerCommandExecutor implements CommandExecutor
 							&& !param.equalsIgnoreCase("w")
 							&& !param.equalsIgnoreCase("unmute")
 							&& !param.equalsIgnoreCase("mute")
-							&& !param.equalsIgnoreCase("download"))
+							&& !param.equalsIgnoreCase("download")
+							//&& !param.equalsIgnoreCase("reload")
+							)
 	                {
 	                	p.sendMessage(new StringBuilder(pre).append(" No such command. Use /pb help").toString());
 	                	return true;
@@ -713,6 +682,13 @@ public class ServerCommandExecutor implements CommandExecutor
 							}
 		            	}
 					}
+					/*if(param.equalsIgnoreCase("reload"))
+					{
+						if(plugin.reloadChanges())
+						{
+							Bukkit.getServer().broadcastMessage("worked");
+						}
+					}*/
 					if(p.hasPermission("pb") || p.hasPermission("pn.*"))
 	            	{
 		            	if(param.equalsIgnoreCase("whitelist") || param.equalsIgnoreCase("wl"))
@@ -740,7 +716,7 @@ public class ServerCommandExecutor implements CommandExecutor
 			        	            String thisWord;
 			        	            String replaceAppend;
 			        	            p.sendMessage((new StringBuilder(pre).append(" Whitelisted words:")).toString());
-			            			for(Iterator iterator = whiteList.entrySet().iterator(); iterator.hasNext(); sender.sendMessage((new StringBuilder(String.valueOf(thisWord).replace("\\w*", "").replace("+?", ""))).append(replaceAppend).toString()))
+			            			for(Iterator iterator = whiteList.entrySet().iterator(); iterator.hasNext(); sender.sendMessage((new StringBuilder(String.valueOf(thisWord).replace("\\w*", "")/*.replace("+?", "")*/)).append(replaceAppend).toString()))
 			        	            {
 			        	                java.util.Map.Entry entry = (java.util.Map.Entry)iterator.next(); 
 			        	                thisWord = (String)entry.getKey();
@@ -767,21 +743,15 @@ public class ServerCommandExecutor implements CommandExecutor
 				            		}
 			            			if(args.length > 2)
 			                        {
-			                            String whiteWord = args[2].toLowerCase();
-			                            if(whiteWord.indexOf("w*") > 0)
+			                            String whiteWord = args[2].toLowerCase().replace("\\w*", "");
+			                            if(plugin.addWhiteWord(whiteWord))
 			                            {
-			                            	p.sendMessage(new StringBuilder(pre).append(" You do not need to put \\w* in the word anymore. The plugin will do that for you").toString());
-			                            }else
+			                                p.sendMessage(new StringBuilder(pre).append(" ").append(whiteWord).append(" was added to the whitelist.").toString());
+			                            } else
 			                            {
-				                            if(plugin.addWhiteWord(whiteWord))
-				                            {
-				                                p.sendMessage(new StringBuilder(pre).append(" ").append(whiteWord).append(" was added to the whitelist.").toString());
-				                            } else
-				                            {
-				                                p.sendMessage(new StringBuilder(pre).append(" ").append(whiteWord).append(" is already in the whitelist.").toString());
-				                            }
-				                            return true;
+			                                p.sendMessage(new StringBuilder(pre).append(" ").append(whiteWord).append(" is already in the whitelist.").toString());
 			                            }
+			                            return true;
 			                        }else
 			                        if(args.length < 3)
 				            		{
@@ -805,21 +775,15 @@ public class ServerCommandExecutor implements CommandExecutor
 				            		}else
 			                        if(args.length > 2)
 			                        {
-			                            String whiteWord = args[2].toLowerCase();
-			                            if(whiteWord.indexOf("w*") > 0)
+			                            String whiteWord = args[2].toLowerCase().replace("\\w*", "").replace("+?", "");
+			                            if(plugin.delWhiteWord(whiteWord))
 			                            {
-			                            	p.sendMessage(new StringBuilder(pre).append(" You do not need to put \\w* in the word anymore. The plugin will do that for you").toString());
-			                            }else
+			                                p.sendMessage(new StringBuilder(pre).append(" ").append(whiteWord).append(" was deleted from the whitelist.").toString());
+			                            } else
 			                            {
-				                            if(plugin.delWhiteWord(whiteWord))
-				                            {
-				                                p.sendMessage(new StringBuilder(pre).append(" ").append(whiteWord).append(" was deleted from the whitelist.").toString());
-				                            } else
-				                            {
-				                                p.sendMessage(new StringBuilder(pre).append(" ").append(whiteWord).append(" is not in the whitelist.").toString());
-				                            }
-				                            return true;
+			                                p.sendMessage(new StringBuilder(pre).append(" ").append(whiteWord).append(" is not in the whitelist.").toString());
 			                            }
+			                            return true;
 			                        }else
 			                        if(args.length < 3)
 				            		{
@@ -871,7 +835,7 @@ public class ServerCommandExecutor implements CommandExecutor
 			        	            String thisWord;
 			        	            String replaceAppend;
 			        	            p.sendMessage((new StringBuilder(pre).append(" Blacklisted words:")).toString());
-			            			for(Iterator iterator = blackList.entrySet().iterator(); iterator.hasNext(); sender.sendMessage((new StringBuilder(String.valueOf(thisWord).replace("\\w*", "").replace("+?", ""))).append(replaceAppend).toString()))
+			            			for(Iterator iterator = blackList.entrySet().iterator(); iterator.hasNext(); sender.sendMessage((new StringBuilder(String.valueOf(thisWord).replace("\\w*", "")/*.replace("+?", "")*/)).append(replaceAppend).toString()))
 			        	            {
 			        	                java.util.Map.Entry entry = (java.util.Map.Entry)iterator.next();
 			        	                thisWord = (String)entry.getKey();
@@ -908,28 +872,21 @@ public class ServerCommandExecutor implements CommandExecutor
 														sb.append(":");
 													}
 												}
-												blackWord = sb.toString().toLowerCase();
+												blackWord = sb.toString().toLowerCase().replace("\\w*", "").replace("+?", "");
 											}
 										} else
 										{
-											blackWord = args[2].toLowerCase();
+											blackWord = args[2].toLowerCase().replace("\\w*", "").replace("+?", "");
 										}
-			                            if(blackWord.indexOf("w*") > 0)
-			                            {
-			                            	p.sendMessage(new StringBuilder(pre).append(" You do not need to put \\w* in the word anymore. The plugin will do that for you").toString());
-			                            	return true;
-			                            }else
-			                            {
-											if(plugin.addBlackWord(blackWord))
-											{
-												p.sendMessage(new StringBuilder(pre).append(" ").append(blackWord).append(" was added to the blacklist.").toString());
-											} else
-											{
-												String blackWords[] = blackWord.split(":");
-												p.sendMessage(new StringBuilder(pre).append(" ").append(blackWords[0]).append(" is already in the blacklist.").toString());
-											}
-											return true;
-			                            }
+										if(plugin.addBlackWord(blackWord))
+										{
+											p.sendMessage(new StringBuilder(pre).append(" ").append(blackWord).append(" was added to the blacklist.").toString());
+										} else
+										{
+											String blackWords[] = blackWord.split(":");
+											p.sendMessage(new StringBuilder(pre).append(" ").append(blackWords[0]).append(" is already in the blacklist.").toString());
+										}
+										return true;
 									}
 			                    }
 			            		else
@@ -964,29 +921,24 @@ public class ServerCommandExecutor implements CommandExecutor
 														sb.append(":");
 													}
 												}
-												blackWord = sb.toString().toLowerCase();
+												blackWord = sb.toString().toLowerCase().replace("\\w*", "").replace("+?", "");
 											}
 										}else
 										{
-											blackWord = args[2].toLowerCase();
+											blackWord = args[2].toLowerCase().replace("\\w*", "").replace("+?", "");
 										}
-			                            if(blackWord.indexOf("w*") > 0)
-			                            {
-			                            	p.sendMessage(new StringBuilder(pre).append(" You do not need to put \\w* in the word anymore. The plugin will do that for you").toString());
-			                            	return true;
-			                            }else
-			                            {
-											if(plugin.delBlackWord(blackWord))
-											{
-												String blackwords[] = blackWord.split(":");
-												p.sendMessage(new StringBuilder(pre).append(" ").append(blackwords[0]).append(" was deleted from the blacklist.").toString());
-											} else
-											{
-												String blackwords[] = blackWord.split(":");
-												p.sendMessage(new StringBuilder(pre).append(" ").append(blackwords[0]).append(" is not in the blacklist.").toString());
-											}
-											return true;
-			                            }
+
+										if(plugin.delBlackWord(blackWord))
+										{
+											String blackwords[] = blackWord.split(":");
+											p.sendMessage(new StringBuilder(pre).append(" ").append(blackwords[0]).append(" was deleted from the blacklist.").toString());
+										} else
+										{
+											String blackwords[] = blackWord.split(":");
+											p.sendMessage(new StringBuilder(pre).append(" ").append(blackwords[0]).append(" is not in the blacklist.").toString());
+										}
+										return true;
+		                            
 									}
 
 		            			}else
@@ -1135,7 +1087,7 @@ public class ServerCommandExecutor implements CommandExecutor
 		        	            String thisWord;
 		        	            String replaceAppend;
 		        	            p.sendMessage((new StringBuilder(pre).append(" Instaban words:")).toString());
-		            			for(Iterator iterator = instaBanList.entrySet().iterator(); iterator.hasNext(); sender.sendMessage((new StringBuilder(String.valueOf(thisWord).replace("\\w*", "").replace("+?", ""))).append(replaceAppend).toString()))
+		            			for(Iterator iterator = instaBanList.entrySet().iterator(); iterator.hasNext(); sender.sendMessage((new StringBuilder(String.valueOf(thisWord).replace("\\w*", "")/*.replace("+?", "")*/)).append(replaceAppend).toString()))
 		        	            {
 		        	                java.util.Map.Entry entry = (java.util.Map.Entry)iterator.next();
 		        	                thisWord = (String)entry.getKey();
@@ -1156,21 +1108,15 @@ public class ServerCommandExecutor implements CommandExecutor
 			            		}
 		            			if(args.length > 2)
 		                        {
-		                            String banWord = args[2].toLowerCase();
-		                            if(banWord.indexOf("w*") > 0)
+		                            String banWord = args[2].toLowerCase().replace("\\w*", "").replace("+?", "");
+		                            if(plugin.addBanWord(banWord))
 		                            {
-		                            	p.sendMessage(new StringBuilder(pre).append(" You do not need to put \\w* in the word anymore. The plugin will do that for you").toString());
+		                                p.sendMessage(new StringBuilder(pre).append(" ").append(banWord).append(" was added to the instaban.").toString());
 		                            }else
 		                            {
-			                            if(plugin.addBanWord(banWord))
-			                            {
-			                                p.sendMessage(new StringBuilder(pre).append(" ").append(banWord).append(" was added to the instaban.").toString());
-			                            }else
-			                            {
-			                                p.sendMessage(new StringBuilder(pre).append(" ").append(banWord).append(" was already in the instaban list.").toString());
-			                            }
-			                            return true;
+		                                p.sendMessage(new StringBuilder(pre).append(" ").append(banWord).append(" was already in the instaban list.").toString());
 		                            }
+		                            return true;
 		                        }else
 		                        if(args.length < 3)
 			            		{
@@ -1193,21 +1139,15 @@ public class ServerCommandExecutor implements CommandExecutor
 			            		}else
 		                        if(args.length > 2)
 		                        {
-		                            String banWord = args[2].toLowerCase();
-		                            if(banWord.indexOf("w*") > 0)
+		                            String banWord = args[2].toLowerCase().replace("\\w*", "").replace("+?", "");
+		                            if(plugin.delBanWord(banWord))
 		                            {
-		                            	p.sendMessage(new StringBuilder(pre).append(" You do not need to put \\w* in the word anymore. The plugin will do that for you").toString());
-		                            }else
+		                                p.sendMessage(new StringBuilder(pre).append(" ").append(banWord).append(" was deleted from the instaban list.").toString());
+		                            } else
 		                            {
-			                            if(plugin.delBanWord(banWord))
-			                            {
-			                                p.sendMessage(new StringBuilder(pre).append(" ").append(banWord).append(" was deleted from the instaban list.").toString());
-			                            } else
-			                            {
-			                                p.sendMessage(new StringBuilder(pre).append(" ").append(banWord).append(" is not in the instaban list.").toString());
-			                            }
-			                            return true;
+		                                p.sendMessage(new StringBuilder(pre).append(" ").append(banWord).append(" is not in the instaban list.").toString());
 		                            }
+		                            return true;
 		                        }else
 		                        	
 		                        if(args.length < 3)

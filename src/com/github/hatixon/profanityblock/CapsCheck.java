@@ -1,5 +1,6 @@
 package com.github.hatixon.profanityblock;
 
+import java.util.*;
 import java.util.logging.Level;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
@@ -10,6 +11,7 @@ import org.bukkit.ChatColor;
 public class CapsCheck implements Listener
 {
 	public static ProfanityBlock plugin;	
+	ArrayList<String> bypassMaps = new ArrayList<String>();
 	public CapsCheck(ProfanityBlock instance)
 	{
 		plugin = instance;
@@ -34,18 +36,8 @@ public class CapsCheck implements Listener
 			return;
 		}
 		String message = e.getMessage();
-		int BypassCode = plugin.getConfig().getInt("BypassCode.Caps");
-		String contains1 = new StringBuilder().append("bypasscode").append(BypassCode).toString();
-		int BypassCodeCancel = plugin.getConfig().getInt("BypassCode.CapsCancel");
-		String contains2 = new StringBuilder().append("bypasscode").append(BypassCodeCancel).toString();
-		if(message.contains(contains1))
+		if(bypassMaps.contains(e.getPlayer().getName()))
 		{
-			e.setMessage(message.replaceAll(contains1, "").toLowerCase());
-			return;
-		}
-		if(message.contains(contains2))
-		{
-			e.setCancelled(true);
 			return;
 		}
 		Player p = e.getPlayer();
