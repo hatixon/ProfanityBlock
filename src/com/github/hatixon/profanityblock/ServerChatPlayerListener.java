@@ -45,7 +45,7 @@ public class ServerChatPlayerListener extends JavaPlugin implements Listener
 			player.sendMessage(new StringBuilder(pre).append(" You are muted and can not talk!").toString());
 			return;
 		}
-		if(plugin.containsIP(message))
+		if(plugin.containsIP(message, player))
 		{
 			player.sendMessage(new StringBuilder(pre).append(" Do not advertise!").toString());
 			chat.setCancelled(true);
@@ -117,17 +117,14 @@ public class ServerChatPlayerListener extends JavaPlugin implements Listener
     		{
     			player.sendMessage(new StringBuilder(pre).append(" ").append(plugin.getMessageWarn()).toString());
     			plugin.logPlayerSwearing(chat.getPlayer().getName(), chat.getMessage(), "Chat");
-    			int BypassCode = plugin.getConfig().getInt("BypassCode.Caps");
-    			int BypassCodeCancel = plugin.getConfig().getInt("BypassCode.CapsCancel");
     			String message2 = plugin.instaCensorCheck(message);
     			if(message2.length() > 0)
     			{
-    				chat.setMessage(new StringBuilder().append(message2).append(" ").append(new StringBuilder().append("bypasscode").append(BypassCode)).toString());
-    			} else
-    			{    				
-    				chat.setMessage(new StringBuilder().append(message2).append(" ").append(new StringBuilder().append("bypasscode").append(BypassCodeCancel)).toString());
+    				chat.setMessage(message2);
+    			}else
+    			{
+    				chat.setCancelled(true);
     			}
-    			return;
     		}else
     		{	
     			plugin.logPlayerSwearing(chat.getPlayer().getName(), chat.getMessage(), "Chat");

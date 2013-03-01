@@ -55,6 +55,12 @@ public class CommandListener implements Listener
 				}
 		    	String message = sb.toString();
 		    	String action;
+				if(plugin.containsIP(message, player))
+				{
+					player.sendMessage(new StringBuilder(pre).append(" Do not advertise!").toString());
+					e.setCancelled(true);
+					return;
+				}
 	    		if(player.hasPermission("pb.bypass.swear") || player.hasPermission("pb.*"))
 	    		{
 	    			return;

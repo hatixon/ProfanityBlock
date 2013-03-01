@@ -396,7 +396,6 @@ public class ProfanityBlock extends JavaPlugin
 		getUserList();
 		getCommandsList();
 		loadMuteList();
-		writeBypassCodes();
 		if(getConfig().getBoolean("CheckForUpdates"))
 		{
 			if(isUpdated())
@@ -761,29 +760,6 @@ public class ProfanityBlock extends JavaPlugin
             {
                 whiteWordList.put(thisLine, "");
             }
-		}
-	}
- 
-	public void writeBypassCodes()
-	{
-		if(getConfig().getBoolean("RandomizeCodes"))
-		{
-	    	Random randomGenerator = new Random();
-	    	for(int idx = 1; idx <= 10; ++idx)
-	    	{
-	    		int randomInt = randomGenerator.nextInt(900000);
-	    		getConfig().set("BypassCode.Caps", randomInt);
-	    		saveConfig();
-	    	}
-	    	for(int idx = 1; idx <= 10; ++idx)
-	    	{
-	    		int randomInt = randomGenerator.nextInt(9000000);
-	    		getConfig().set("BypassCode.CapsCancel", randomInt);
-	    		saveConfig();
-	    	}
-		}else
-		{
-			return;
 		}
 	}
 	
@@ -1472,9 +1448,9 @@ public class ProfanityBlock extends JavaPlugin
 		}
 	}
 	
-	public boolean containsIP(String message)
+	public boolean containsIP(String message, Player p)
 	{
-		if(message.startsWith("http://") || message.startsWith("www"))
+		if(message.startsWith("http://") || message.startsWith("www") || p.hasPermission("pb.bypass.advertise") || p.hasPermission("pb.*"))
 		{
 			return false;
 		}
