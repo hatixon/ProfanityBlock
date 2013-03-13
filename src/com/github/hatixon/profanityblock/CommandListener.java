@@ -105,10 +105,8 @@ public class CommandListener implements Listener
 	    	
 				}else
 				{
-
 			    	if(plugin.didTheySwear(message))
 			    	{
-
 		    			e.setCancelled(true);
 			            if(plugin.getNotifyOp())
 			            {
@@ -193,6 +191,7 @@ public class CommandListener implements Listener
 						}
 						return;
 			    	}
+			    	
 					if(!player.hasPermission("pb.bypass.spam"))
 					{
 						String verdict = plugin.redirect(player, message, new Date().getTime());

@@ -52,24 +52,30 @@ public class ProfanityBlock extends JavaPlugin
 	private File instantFile = null;
 	private FileConfiguration warnConfig = null;
 	private File warnFile = null;
-	
-	String pre = (new StringBuilder().append(ChatColor.RED).append("[ProfanityBlock]").append(ChatColor.YELLOW)).toString();
-	
+	private String pre = (new StringBuilder().append(ChatColor.RED).append("[ProfanityBlock]").append(ChatColor.YELLOW)).toString();
 	private Map blackWordList;
-	
 	private Map<Player, String> repeatList = new HashMap();
-	
 	private Map whiteWordList;
-	
 	private Map instaBanList;
-	
 	private Map userList;
-	
 	private Map commandsList;  
+	Map<String, Queueing> messageLineup = new HashMap();
 	
 	public Map getUserMap()
 	{
 		return userList;
+	}
+	
+	public void addPlayerToQueue(String name)
+	{
+		messageLineup.put(name, new Queueing());
+		
+	}
+	
+	public boolean CheckQueue(String name)
+	{
+		
+		return false;
 	}
 	
 	public void getUserList()
@@ -400,11 +406,10 @@ public class ProfanityBlock extends JavaPlugin
 		{
 			if(isUpdated())
 			{
-				logger.info(new StringBuilder(pre).append("There is an updated version of ProfanityBlock. Download at http://dev.bukkit.org/server-mods/mutenizer/").toString());
+				logger.info(new StringBuilder(pre).append("There is an updated version of ProfanityBlock. Download at http://dev.bukkit.org/server-mods/profanityblock/").toString());
 			}
 		}
-		getConfig().addDefault("Caps.MinimumLength", Integer.valueOf(5));
-		getConfig().addDefault("SpamEnabled", true);
+		getConfig().addDefault("QueuedMessagePunishment", "ban");
 		saveConfig();
 	}
 	
@@ -886,6 +891,7 @@ public class ProfanityBlock extends JavaPlugin
 					.replace(".", "").replace(",", "")
 					.replace("\\/", "v").replace("|<", "k")
 					.replace("0", "o").replace("1", "i")
+					.replace("3", "e")
 					.replace("/\\", "a").replace("/-\\", "a")
 					.replace("4", "a").replace("@", "a")
 					.replace("\\", "").replace("/", "")
@@ -929,6 +935,7 @@ public class ProfanityBlock extends JavaPlugin
 					.replace(".", "").replace(",", "")
 					.replace("\\/", "v").replace("|<", "k")
 					.replace("0", "o").replace("1", "i")
+					.replace("3", "e")
 					.replace("/\\/\\", "m").replace("/\\/", "n")
 					.replace("4", "a").replace("@", "a")
 					.replace("\\", "").replace("/", "")
@@ -1465,6 +1472,19 @@ public class ProfanityBlock extends JavaPlugin
 		}
 		return false;
 	}
+	
+public boolean getQueuePunish()
+{
+	if(getConfig().getString("QueuedMessagePunishment").equalsIgnoreCase("ban"))
+	{
+		return true;
+	}else
+	if(getConfig().getString("QueuedMessagePunishment").equalsIgnoreCase("mute"))
+	{
+		return false;
+	}
+	return true;
+}
 	
 	/*public boolean reloadChanges()
 	{

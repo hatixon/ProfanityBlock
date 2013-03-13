@@ -434,7 +434,7 @@ public class ServerCommandExecutor implements CommandExecutor
 	            		{
 	            			if(plugin.isUpdated())
 	            			{
-	            				ccs.sendMessage(new StringBuilder(pre).append(" There is an updated version of ProfanityBlock. Download at http://dev.bukkit.org/server-mods/mutenizer/").toString());
+	            				ccs.sendMessage(new StringBuilder(pre).append(" There is an updated version of ProfanityBlock. Download at http://dev.bukkit.org/server-mods/profanityblock/").toString());
 	            			}
 	            			return true;
 	            		}
@@ -1060,7 +1060,7 @@ public class ServerCommandExecutor implements CommandExecutor
 	            			{
 	            				if(p.hasPermission("pb.version") || p.hasPermission("pb.*"))
 	            				{
-	            					p.sendMessage(new StringBuilder(pre).append(" There is an updated version of ProfanityBlock. Download at http://dev.bukkit.org/server-mods/mutenizer").toString());
+	            					p.sendMessage(new StringBuilder(pre).append(" There is an updated version of ProfanityBlock. Download at http://dev.bukkit.org/server-mods/profanityblock").toString());
 	            				}
 	            				
 	            			}

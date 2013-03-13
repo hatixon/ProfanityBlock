@@ -13,9 +13,9 @@ import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
 import java.util.logging.Level;
 import java.util.regex.*;
+import com.github.hatixon.profanityblock.*;
 
 @SuppressWarnings({"unused", "rawtypes"})
 public class ServerChatPlayerListener extends JavaPlugin implements Listener 
@@ -59,9 +59,12 @@ public class ServerChatPlayerListener extends JavaPlugin implements Listener
 				
 			}else
 			{
+				plugin.logPlayerSwearing(player.getName(), message, "Spam");
 				chat.setMessage("");
 				chat.setCancelled(true);
+				
 			}
+			
 			if(verdict.equalsIgnoreCase("banned"))
 			{
 				if(plugin.getConfig().getString("SpamMuteOrBan").equalsIgnoreCase("mute"))
@@ -86,11 +89,18 @@ public class ServerChatPlayerListener extends JavaPlugin implements Listener
 				}
 				chat.setCancelled(true);
 			}else
-			if(verdict.equalsIgnoreCase("warned"))
+			if(verdict.contains("warned"))
 			{
 				String pre2 = new StringBuilder().append("\247c").append("[ProfanityBlock]").append("\247e").toString();
+				if(verdict.contains("repeated"))
+				{
+					plugin.logger.log(Level.INFO, new StringBuilder().append(pre2).append(player.getName()).append(" blocked for excessive letter repitition: ").append(message).toString());
+				}else
+				{
+					plugin.logger.log(Level.INFO, new StringBuilder().append(pre2).append(player.getName()).append(" blocked by spam: ").append(message).toString());
+				}
 				player.sendMessage(new StringBuilder().append("<").append(player.getDisplayName()).append("> ").append(message).toString());
-				plugin.logger.log(Level.INFO, new StringBuilder().append(pre2).append(player.getName()).append(" blocked by spam: ").append(message).toString());
+				chat.getFormat();
 				plugin.addRepeated(player,chat.getMessage(), new Date().getTime());
 				chat.setCancelled(true);
 				return;
@@ -128,15 +138,15 @@ public class ServerChatPlayerListener extends JavaPlugin implements Listener
     		}else
     		{	
     			plugin.logPlayerSwearing(chat.getPlayer().getName(), chat.getMessage(), "Chat");
-    			int BypassCode = plugin.getConfig().getInt("BypassCode.Caps");
-    			int BypassCodeCancel = plugin.getConfig().getInt("BypassCode.CapsCancel");
     			String message2 = plugin.instaCensorCheck(message);
     			if(message2.length() > 0)
     			{
-    				chat.setMessage(new StringBuilder().append(message2).append(" ").append(new StringBuilder().append("bypasscode").append(BypassCode)).toString());
+    				chat.setCancelled(true);
+
+    				plugin.playerCapsCheck.bypassMaps.add(chat.getPlayer().getName());
     			} else
     			{    				
-    				chat.setMessage(new StringBuilder().append(message2).append(" ").append(new StringBuilder().append("bypasscode").append(BypassCodeCancel)).toString());
+    				chat.setMessage(message2);
     			}
     			if(plugin.getConfig().getString("MuteOrBan").equalsIgnoreCase("mute"))
     			{
@@ -168,8 +178,6 @@ public class ServerChatPlayerListener extends JavaPlugin implements Listener
 	    		plugin.logPlayerSwearing(chat.getPlayer().getName(), chat.getMessage(), "Chat");
 				
 	    		String uName = player.getName();
-	    		int BypassCode = plugin.getConfig().getInt("BypassCode.Caps");
-	    		int BypassCodeCancel = plugin.getConfig().getInt("BypassCode.CapsCancel");
     			String message2 = plugin.censorCheck(message);
     			if(message2.length() > 0)
     			{
@@ -277,8 +285,142 @@ public class ServerChatPlayerListener extends JavaPlugin implements Listener
 				}
 				return;
 	    	}
-
-			return;
+	    	if(!plugin.messageLineup.containsKey(player.getName()))
+	    	{
+	    		plugin.addPlayerToQueue(player.getName());
+	    	}
+			Queueing mQueue = (Queueing)plugin.messageLineup.get(chat.getPlayer().getName());
+	    	mQueue.addMessage(" " + chat.getMessage().toLowerCase());
+			String queueMessage = mQueue.returnQueue();
+			if(plugin.instaBanCheck(queueMessage))
+			{
+				chat.setCancelled(true);
+				mQueue.clearAll();
+				if(plugin.getQueuePunish())
+				{
+					plugin.instaBanPlayer(player);
+					plugin.logPlayerSwearing(player.getName(), queueMessage, "Split across lines");
+				}else
+				if(plugin.getQueuePunish() == false)
+				{
+					plugin.mutePlayer(player.getName().toLowerCase());
+    				if(plugin.getNotifyOp())
+    				{
+    					plugin.notifyOp(player, "muted");
+    				}
+    				player.sendMessage(new StringBuilder(pre).append(" You have been muted!").toString());
+				}
+			}else
+			{
+		    	if(plugin.didTheySwear(queueMessage))
+		    	{
+		    		mQueue.clearAll();
+		    		plugin.logPlayerSwearing(chat.getPlayer().getName(), queueMessage, "Split across lines");
+		    		String uName = player.getName();
+		    		chat.setCancelled(true);
+		    		
+		            if(plugin.getNotifyOp())
+		            {
+		            	plugin.notifyOp(player, "Chat");
+		            }
+		            
+		    		if(plugin.getMoneyEnabled())
+		    		{
+		    			if(player.hasPermission("pb.bypass.money") || player.hasPermission("pb.*"))
+		    			{
+		    				
+		    			}
+		    			else
+		    			{
+		    				plugin.executeMoneyRemoval(uName);
+		    			}
+		    		}
+		    		
+		    		if(plugin.getNotifyPlayer())
+		    		{
+		    			player.sendMessage(new StringBuilder(pre).append(" ").append(plugin.getMessageWarn()).toString());
+		    		}
+		    		
+		    		plugin.addRepeated(player, chat.getMessage(), new Date().getTime());
+		    		
+		    		if(type.contains(("warnings").toLowerCase()))
+		    		{
+			    		if(plugin.getTotWarn().intValue() != -1)
+			    		{
+			    			Integer wBK = plugin.getWarnBKick();
+			                Integer warnRemaining = plugin.getRemWarn(uName);
+			                Integer warnRemainings = Integer.valueOf((warnRemaining.intValue()) - 1);
+			                plugin.setRemWarn(uName, warnRemainings);
+			                
+			        		if(warnRemainings.intValue() > 0)
+			        		{
+			    				if(warnRemainings.intValue() < wBK)
+			    				{
+			    						if(player.hasPermission("pb.bypass.ban") || player.hasPermission("pb.*"))
+			    						{
+			    							return;
+			    						}
+			    						else
+			    						{
+			    							action = plugin.getMessageKick();
+			    							player.kickPlayer(action);
+			    							if(plugin.getNotifyOp())
+			    							{
+			    								plugin.notifyOp(player, "kick");
+			    							}
+			    							return;
+			    						}
+			        			}
+			        		}
+			        		else
+			        		if(warnRemainings.intValue() == 0)
+			        		{
+				        		{
+				        			if(player.hasPermission("pb.bypass.ban") || player.hasPermission("pb.*"))
+				        			{
+				        				player.sendMessage(new StringBuilder(pre).append(" Please stop using too many capitals.").toString());
+				        				plugin.resetBanned(uName);
+				        				return;
+				        			}
+			        				if(plugin.getResetOnBan())
+			        				{
+			        					plugin.resetBanned(uName);
+			        				}
+			        				if(plugin.getConfig().getString("MuteOrBan").equalsIgnoreCase("mute"))
+			        				{
+			        					plugin.mutePlayer(uName);
+			        					if(plugin.getNotifyOp())
+			        					{
+			        						plugin.notifyOp(player, "muted");
+			        					}
+			        					player.sendMessage(new StringBuilder(pre).append(" You have been muted!").toString());
+			        				}else
+			        				if(plugin.getConfig().getString("MuteOrBan").equalsIgnoreCase("ban"))
+			        				{
+			        					plugin.bunnyRabbit(player);
+			        					if(plugin.getNotifyOp())
+			        					{
+			        						plugin.notifyOp(player, "banned");
+			        					}
+			        				}else
+			        				{
+			        					plugin.logger.log(Level.SEVERE, new StringBuilder(pre).append(" Incorrect config option: MuteOrBan. Must be either \"mute\" or \"ban\"").toString());
+			        				}
+				        		}
+			        		}
+			    		}
+		    		}
+					if(type.contains(("Lightning").toLowerCase()))
+					{
+						player.getWorld().strikeLightning(player.getLocation());
+					}
+					if(type.contains(("damage").toLowerCase()))
+					{
+						player.damage(plugin.getConfig().getInt("Damage"));
+					}
+					return;
+		    	}
+			}
 		}
     }
     
@@ -288,7 +430,6 @@ public class ServerChatPlayerListener extends JavaPlugin implements Listener
     	Player p = join.getPlayer();
     	String uName = p.getName();
     	String userWarnings = (new StringBuilder("Warnings.Warned.").append(uName.toLowerCase())).toString();
-    	List userListing = (List)plugin.getUserConfig().getStringList("UserList");
     	ChatColor RED = ChatColor.RED;
     	ChatColor YEL = ChatColor.YELLOW;
 		String pre = (new StringBuilder().append(RED).append("[ProfanityBlock]").append(YEL)).toString();
@@ -300,10 +441,7 @@ public class ServerChatPlayerListener extends JavaPlugin implements Listener
     	{
     		p.sendMessage(new StringBuilder(pre).append(" You have ").append(plugin.getRemWarn(uName.toLowerCase())).append(" warning(s) remaining.").toString());
     	}
-    	if(!userListing.contains(uName))
-    	{
-    		plugin.addUserL(uName.toLowerCase());
-    	}
+
     	if(plugin.getConfig().getBoolean("CheckForUpdates"))
     	{
     		if(p.hasPermission("pb.version") || p.hasPermission("pb.*"))
@@ -317,5 +455,6 @@ public class ServerChatPlayerListener extends JavaPlugin implements Listener
     	SpamCheck.lastMessage.remove(p);
     	SpamCheck.lastMessageTimeStamp.remove(p);
     	SpamCheck.spamCount.remove(p);
+    	plugin.addPlayerToQueue(join.getPlayer().getName());
     }
 }
